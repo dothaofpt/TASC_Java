@@ -1,3 +1,5 @@
+package B2;
+
 public class B2_StringDemo {
     public static void main(String[] args) {
 //   1:     create String

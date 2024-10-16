@@ -1,5 +1,6 @@
-package B4;
 
+// Class and Instance
+package B4;
 public  class Fruits {
     String name;
     int price;

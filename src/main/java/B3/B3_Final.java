@@ -1,3 +1,5 @@
+package B3;
+
 public class B3_Final {
 //    gia tri khi duoc gan cho bien la khong the thay doi
     private  final int money = 10000;

@@ -1,3 +1,5 @@
+package B3;
+
 public class B3_Static {
 //    Giờ thì hãy tạo ra 1 lớp với biến static và static method
 //    Ví dụ : có 1 cái bảng đen, tất cả học sinh có thể viết vào bảng đó (static and method static)
