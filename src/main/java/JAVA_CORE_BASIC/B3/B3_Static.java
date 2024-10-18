@@ -1,4 +1,4 @@
-package B3;
+package JAVA_CORE_BASIC.B3;
 
 public class B3_Static {
 //    Giờ thì hãy tạo ra 1 lớp với biến static và static method

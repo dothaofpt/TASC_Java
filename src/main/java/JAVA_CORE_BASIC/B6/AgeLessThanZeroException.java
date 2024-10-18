@@ -1,4 +1,4 @@
-package B6;
+package JAVA_CORE_BASIC.B6;
 
 public class AgeLessThanZeroException extends Exception{
     public static void main(String[] args) throws AgeLessThanZeroException {

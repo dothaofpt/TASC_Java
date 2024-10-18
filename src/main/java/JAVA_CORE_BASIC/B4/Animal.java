@@ -1,5 +1,5 @@
 //interface
-package B4;
+package JAVA_CORE_BASIC.B4;
 public interface Animal {
     public String speak();
     public String eat();

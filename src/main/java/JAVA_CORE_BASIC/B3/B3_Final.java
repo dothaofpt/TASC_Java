@@ -1,4 +1,4 @@
-package B3;
+package JAVA_CORE_BASIC.B3;
 
 public class B3_Final {
 //    gia tri khi duoc gan cho bien la khong the thay doi

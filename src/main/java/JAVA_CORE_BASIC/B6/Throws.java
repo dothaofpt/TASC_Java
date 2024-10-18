@@ -1,4 +1,4 @@
-package B6;
+package JAVA_CORE_BASIC.B6;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

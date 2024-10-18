@@ -1,5 +1,5 @@
 
-package B4;
+package JAVA_CORE_BASIC.B4;
 
 public class B4_ThisAndSuper {
     // Ví dụ về this và super

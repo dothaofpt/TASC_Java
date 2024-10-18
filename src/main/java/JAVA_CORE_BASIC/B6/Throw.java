@@ -1,4 +1,4 @@
-package B6;
+package JAVA_CORE_BASIC.B6;
 
 public class Throw {
 //    được sử dụng để tạo ra 1 ngoại lệ cụ thể và đẩy nó ra khỏi phương thức hiện tại

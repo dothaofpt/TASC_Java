@@ -1,5 +1,5 @@
 
-package JAVA_COLLECTION;
+package JAVA_COLLECTION.B1;
 
 // Array là một mảng có kích thước cố định không thể thay đổi
 // Giúp gộp chung nhóm các đối tượng có chung tính chất lại với nhau

@@ -1,6 +1,6 @@
 
 // Class and Instance
-package B4;
+package JAVA_CORE_BASIC.B4;
 public  class Fruits {
     String name;
     int price;

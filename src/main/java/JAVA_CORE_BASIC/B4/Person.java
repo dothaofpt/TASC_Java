@@ -1,5 +1,5 @@
 
-package B4;
+package JAVA_CORE_BASIC.B4;
 
 //Vi du ve lop abstract
 public abstract class Person {

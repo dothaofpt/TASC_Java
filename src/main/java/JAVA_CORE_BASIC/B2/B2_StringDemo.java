@@ -1,4 +1,4 @@
-package B2;
+package JAVA_CORE_BASIC.B2;
 
 public class B2_StringDemo {
     public static void main(String[] args) {

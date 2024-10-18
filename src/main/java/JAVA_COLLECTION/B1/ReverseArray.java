@@ -1,4 +1,4 @@
-package JAVA_COLLECTION;
+package JAVA_COLLECTION.B1;
 
 import java.util.Arrays;
 

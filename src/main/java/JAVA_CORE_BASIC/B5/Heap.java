@@ -1,5 +1,5 @@
 
-package B5;
+package JAVA_CORE_BASIC.B5;
 
 import java.util.ArrayList;
 import java.util.List;

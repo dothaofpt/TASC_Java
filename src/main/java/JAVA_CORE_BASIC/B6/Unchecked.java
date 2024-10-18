@@ -1,4 +1,4 @@
-package B6;
+package JAVA_CORE_BASIC.B6;
 
 public class Unchecked {
     public static void main(String[] args) {

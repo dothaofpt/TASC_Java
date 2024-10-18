@@ -1,4 +1,4 @@
-package B1;
+package JAVA_CORE_BASIC.B1;
 
 class Car {
 

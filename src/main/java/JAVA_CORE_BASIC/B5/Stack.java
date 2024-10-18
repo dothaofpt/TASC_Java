@@ -1,4 +1,4 @@
-package B5;
+package JAVA_CORE_BASIC.B5;
 
 public class Stack {
    public static  int calculateFactorial(int n){
