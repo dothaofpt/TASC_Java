@@ -1,30 +1,31 @@
+
 package JAVA_COLLECTION.B2;
 
 import java.util.ArrayList;
 
-public class Array_List {
-// Arraylist là một mảng có thể thay đổi kích thước
-
+public class ShoppingList {
+    // ArrayList là một mảng có thể thay đổi kích thước
     public static void main(String[] args) {
-        String[] gioHangArray = new String[2];
-        gioHangArray[0] = "Oi";
-        gioHangArray[1] = "Dao";
+        // Khởi tạo mảng thông thường
+        String[] gioHangArray = {"Oi", "Dao"};
 
-        ArrayList<String> gioHangArrayList = new ArrayList<>();
-        gioHangArrayList.add("Oi");
-        gioHangArrayList.add("Dao");
-        gioHangArrayList.add("Mit");
+        // Khởi tạo ArrayList
+        ArrayList<String> gioHang = new ArrayList<>();
+        gioHang.add("Oi");
+        gioHang.add("Dao");
+        gioHang.add("Mit");
 
-        gioHangArrayList.set(2, "Le");
-        gioHangArrayList.remove(1);
-        System.out.println(gioHangArrayList.contains("khoai tay"));
-        for(int i =0; i <gioHangArrayList.size(); i++){
-            System.out.println(gioHangArrayList.get(i));
+        // Thay đổi phần tử trong ArrayList
+        gioHang.set(2, "Le");
+        gioHang.remove(1);
 
+        // Kiểm tra xem ArrayList có chứa phần tử "khoai tay" không
+        System.out.println("Có khoai tây không? " + gioHang.contains("khoai tay"));
+
+        // In ra các phần tử trong ArrayList
+        System.out.println("Danh sách giỏ hàng:");
+        for (String item : gioHang) {
+            System.out.println(item);
         }
-
     }
-
-
-
 }
