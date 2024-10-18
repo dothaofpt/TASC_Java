@@ -3,6 +3,8 @@ package JAVA_COLLECTION.B2;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+
+// trước hết tạo 1 class student với các thuộc tính và method get and set, toString
 class Student {
     private int id;
     private String name;
@@ -29,11 +31,12 @@ class Student {
     }
 }
 
+
 public class StudentList {
     public static void main(String[] args) {
         LinkedList<Student> studentList = new LinkedList<>();
 
-        // Thêm sinh viên vào danh sách
+        // Thêm sinh viên vào danh sách LinkedList
         studentList.add(new Student(1, "Alice"));
         studentList.add(new Student(2, "Bob"));
         studentList.add(new Student(3, "Charlie"));

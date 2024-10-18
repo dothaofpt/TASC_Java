@@ -3,6 +3,7 @@ package JAVA_COLLECTION.B2;
 
 import java.util.ArrayList;
 
+// ArrayList
 public class ShoppingList {
     // ArrayList là một mảng có thể thay đổi kích thước
     public static void main(String[] args) {
