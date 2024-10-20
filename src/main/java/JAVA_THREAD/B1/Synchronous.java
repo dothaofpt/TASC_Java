@@ -2,7 +2,7 @@ package JAVA_THREAD.B1;
 
 import java.io.*;
 
-public class Main {
+public class Synchronous {
 
     public static void main(String[] args) {
         //   Duong dan den file doc
