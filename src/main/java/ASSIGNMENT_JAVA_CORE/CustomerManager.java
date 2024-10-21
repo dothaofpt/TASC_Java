@@ -42,8 +42,8 @@ public class CustomerManager {
         System.out.print("Nhap dia chi: ");
         String address = scanner.nextLine();
 
-        if (name.isEmpty() || address.isEmpty() || !isValidEmail(email)) {
-                     System.out.println("Thong tin khong hop le.");
+        if (name.isEmpty() || address.isEmpty() || !isValidEmail(email) || !isValidPhoneNumber(phoneNumber)) {
+            System.out.println("Thong tin khong hop le. Vui long kiem tra lai.");
             return;
         }
 
@@ -52,6 +52,8 @@ public class CustomerManager {
         System.out.println("Khach hang da duoc them thanh cong!");
         saveCustomersToFile();
     }
+
+
 
     // Tim kiem khach hang
     public void SearchCustomer(String phoneNumber) {
@@ -67,17 +69,14 @@ public class CustomerManager {
 
     // Cap nhat khach hang
     public void UpdateCustomer(String phoneNumber) {
-        // loc vong for de in ra thong tin hien  tai cua khách hàng
         for (Customer customer : customers) {
-            // tim khach hàng theo sdt
             if (customer.getPhoneNumber().equals(phoneNumber)) {
                 Scanner scanner = new Scanner(System.in);
                 System.out.println("Thong tin hien tai cua khach hang: " + customer);
 
-                // update lại thông tin khách hàng
                 System.out.print("Nhap ten moi : ");
                 String newName = scanner.nextLine();
-                    if (!newName.isEmpty()) customer.setName(newName);
+                if (!newName.isEmpty()) customer.setName(newName);
 
                 System.out.print("Nhap email moi  : ");
                 String newEmail = scanner.nextLine();
@@ -86,6 +85,17 @@ public class CustomerManager {
                 System.out.print("Nhap dia chi moi : ");
                 String newAddress = scanner.nextLine();
                 if (!newAddress.isEmpty()) customer.setAddress(newAddress);
+
+                // Cập nhật lại số điện thoại, nếu cần
+                System.out.print("Nhap so dien thoai moi (bo qua de giu nguyen): ");
+                String newPhoneNumber = scanner.nextLine();
+                if (!newPhoneNumber.isEmpty()) {
+                    if (!isValidPhoneNumber(newPhoneNumber) || isPhoneNumberExists(newPhoneNumber)) {
+                        System.out.println("So dien thoai khong hop le hoac da ton tai.");
+                        return;
+                    }
+                    customer.setPhoneNumber(newPhoneNumber);
+                }
 
                 System.out.println("Thong tin khach hang da duoc cap nhat thanh cong!");
                 saveCustomersToFile();
@@ -161,4 +171,14 @@ public class CustomerManager {
     private boolean isValidEmail(String email) {
              return email.contains("@") && email.contains(".");
     }
+
+
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        return phoneNumber.length() == 10 && phoneNumber.matches("\\d{10}");
+    }
 }
+
+
+
+
+
