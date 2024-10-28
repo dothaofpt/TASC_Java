@@ -8,7 +8,7 @@ public class Synchronous {
         //   Duong dan den file doc
         String filePath = "C:/Users/PC/Videos/TASC_Java/src/main/java/JAVA_THREAD/B1/file.txt";
 //    Tao doi tuong  FileReader va ButferdReader
-        try(FileReader fileReader = new FileReader(filePath);
+        try (FileReader fileReader = new FileReader(filePath);
             BufferedReader bufferedReader = new BufferedReader(fileReader)){
             String line;
 //        Doc tung dong cho den khi ket thuc file

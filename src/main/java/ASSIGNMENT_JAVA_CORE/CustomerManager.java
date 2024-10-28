@@ -2,183 +2,265 @@
 package ASSIGNMENT_JAVA_CORE;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class CustomerManager {
-    // Tao 1 danh sach khach hang
-            private List<Customer> customers = new ArrayList<>();
+    private Map<String, Customer> customerMap;
     private final String filePath = "customers.txt";
+    private final ExecutorService executorService;
+    private Scanner scanner;
 
-    // Constructor de tai du lieu tu file khi khoi tao
     public CustomerManager() {
-        loadCustomersFromFile();  // Tai danh sach khach hang tu file
+        customerMap = new ConcurrentHashMap<>(); // Sử dụng ConcurrentHashMap cho an toàn khi đa luồng
+        executorService = Executors.newFixedThreadPool(1);
+        scanner = new Scanner(System.in);
+        loadFromFile();
     }
 
-    // Hien thi danh sach khach hang
-    public void DisplayListCustomer() {
-        if (customers.isEmpty()) {
-                    System.out.println("Danh sach khach hang trong.");
-            return;
-        }
-        for (Customer customer : customers) {
-            System.out.println(customer);
-        }
-    }
-
-    // Them khach hang moi
-    public void AddCustomer(String phoneNumber) {
-        if (isPhoneNumberExists(phoneNumber)) {
-            System.out.println("So dien thoai da ton tai.");
-            return;
-        }
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Nhap ten khach hang: ");
-        String name = scanner.nextLine();
-        System.out.print("Nhap email: ");
-        String email = scanner.nextLine();
-        System.out.print("Nhap dia chi: ");
-        String address = scanner.nextLine();
-
-        if (name.isEmpty() || address.isEmpty() || !isValidEmail(email) || !isValidPhoneNumber(phoneNumber)) {
-            System.out.println("Thong tin khong hop le. Vui long kiem tra lai.");
-            return;
-        }
-
-        Customer newCustomer = new Customer(name, email, phoneNumber, address);
-        customers.add(newCustomer);
-        System.out.println("Khach hang da duoc them thanh cong!");
-        saveCustomersToFile();
-    }
-
-
-
-    // Tim kiem khach hang
-    public void SearchCustomer(String phoneNumber) {
-        for (Customer customer : customers) {
-            //search theo so dien thoai
-            if (customer.getPhoneNumber().equals(phoneNumber)) {
-                System.out.println("Khach hang da tim thay: " + customer);
-                       return;
+    // Xem danh sách khách hàng
+    public void displayCustomers() {
+        logExecutionTime("hiển thị khách hàng", () -> {
+            if (customerMap.isEmpty()) {
+                System.out.println("Danh sách khách hàng trống.");
+            } else {
+                System.out.printf("%-20s %-30s %-15s%n", "Tên", "Email", "Số điện thoại");
+                System.out.println("---------------------------------------------------------------");
+                customerMap.values().forEach(customer -> System.out.printf("%-20s %-30s %-15s%n",
+                        customer.getName(), customer.getEmail(), customer.getPhoneNumber()));
             }
-        }
-        System.out.println("Khong tim thay khach hang voi so dien thoai: " + phoneNumber);
+        });
     }
 
-    // Cap nhat khach hang
-    public void UpdateCustomer(String phoneNumber) {
-        for (Customer customer : customers) {
-            if (customer.getPhoneNumber().equals(phoneNumber)) {
-                Scanner scanner = new Scanner(System.in);
-                System.out.println("Thong tin hien tai cua khach hang: " + customer);
+    // Thêm khách hàng mới
+    public void addCustomer() {
+        while (true) {
+            System.out.print("Nhập tên khách hàng (hoặc nhập 'e' để thoát): ");
+            String name = scanner.nextLine();
 
-                System.out.print("Nhap ten moi : ");
-                String newName = scanner.nextLine();
-                if (!newName.isEmpty()) customer.setName(newName);
-
-                System.out.print("Nhap email moi  : ");
-                String newEmail = scanner.nextLine();
-                if (!newEmail.isEmpty() && isValidEmail(newEmail)) customer.setEmail(newEmail);
-
-                System.out.print("Nhap dia chi moi : ");
-                String newAddress = scanner.nextLine();
-                if (!newAddress.isEmpty()) customer.setAddress(newAddress);
-
-                // Cập nhật lại số điện thoại, nếu cần
-                System.out.print("Nhap so dien thoai moi (bo qua de giu nguyen): ");
-                String newPhoneNumber = scanner.nextLine();
-                if (!newPhoneNumber.isEmpty()) {
-                    if (!isValidPhoneNumber(newPhoneNumber) || isPhoneNumberExists(newPhoneNumber)) {
-                        System.out.println("So dien thoai khong hop le hoac da ton tai.");
-                        return;
-                    }
-                    customer.setPhoneNumber(newPhoneNumber);
-                }
-
-                System.out.println("Thong tin khach hang da duoc cap nhat thanh cong!");
-                saveCustomersToFile();
-                return;
-            }
-        }
-        System.out.println("Khong tim thay khach hang voi so dien thoai: " + phoneNumber);
-    }
-
-    // Xoa khac h hang
-    public void deleteCustomer(String phoneNumber) {
-        Customer customerToRemove = null;
-        // loc customers
-        for (Customer customer : customers) {
-            // lấy sdt làm dk xóa khách hàng
-            if (customer.getPhoneNumber().equals(phoneNumber)) {
-                        customerToRemove = customer;
+            if (name.equalsIgnoreCase("e")) {
                 break;
             }
-        }
 
-        if (customerToRemove != null) {
-            customers.remove(customerToRemove);
-            saveCustomersToFile();
-            System.out.println("Xoa khach hang thanh cong.");
-        }          else {
-            System.out.println("Khong tim thay khach hang.");
+            String email;
+            while (true) {
+                System.out.print("Nhập email khách hàng: ");
+                email = scanner.nextLine();
+                if (isValidEmail(email)) {
+                    break; // Lặp đến khi nào nhập đúng
+                } else {
+                    System.out.println("Email không hợp lệ. Vui lòng nhập lại.");
+                }
+            }
+
+            String phoneNumber;
+            while (true) {
+                System.out.print("Nhập số điện thoại khách hàng: ");
+                phoneNumber = scanner.nextLine();
+
+                if (customerMap.containsKey(phoneNumber)) {
+                    System.out.println("Số điện thoại đã tồn tại. Vui lòng nhập số điện thoại khác.");
+                } else if (isValidPhoneNumber(phoneNumber)) {
+                    break; // Lặp đến khi nào nhập đúng
+                } else {
+                    System.out.println("Số điện thoại không hợp lệ. Vui lòng nhập lại.");
+                }
+            }
+
+            Customer customer = new Customer(name, email, phoneNumber);
+            customerMap.put(phoneNumber, customer);
+            executorService.submit(() -> saveToFilePartially(customer)); // Ghi dữ liệu mới trong đa luồng
+            System.out.println("Khách hàng đã được thêm thành công.");
+        }
+        System.out.println("Đã thoát khỏi chế độ thêm khách hàng.");
+    }
+
+    // Sửa thông tin khách hàng
+    public void editCustomer() {
+        logExecutionTime("sửa thông tin khách hàng", () -> {
+            String phoneNumber = "";
+            boolean customerExists = false;
+
+            while (!customerExists) {
+                System.out.print("Nhập số điện thoại khách hàng cần sửa: ");
+                phoneNumber = scanner.nextLine();
+
+                if (!customerMap.containsKey(phoneNumber)) {
+                    System.out.println("Khách hàng không tồn tại. Vui lòng nhập lại.");
+                } else {
+                    customerExists = true;
+                }
+            }
+
+            System.out.print("Nhập tên khách hàng mới(không bắt buộc): ");
+            String newName = scanner.nextLine();
+            System.out.print("Nhập email khách hàng mới(không bắt buộc): ");
+            String newEmail = scanner.nextLine();
+            System.out.print("Nhập số điện thoại khách hàng mới (không bắt buộc): ");
+            String newPhoneNumber = scanner.nextLine();
+
+            Customer customer = customerMap.get(phoneNumber);
+
+            if (!newName.isEmpty()) {
+                customer.setName(newName);
+            }
+            if (!newEmail.isEmpty()) {
+                if (!isValidEmail(newEmail)) {
+                    System.out.println("Email không hợp lệ. Không được cập nhật.");
+                } else {
+                    customer.setEmail(newEmail);
+                }
+            }
+            if (!newPhoneNumber.isEmpty()) {
+                if (customerMap.containsKey(newPhoneNumber)) {
+                    System.out.println("Số điện thoại mới đã tồn tại. Không được cập nhật.");
+                } else {
+                    customerMap.remove(phoneNumber);
+                    customer.setPhoneNumber(newPhoneNumber);
+                    customerMap.put(newPhoneNumber, customer);
+                }
+            }
+
+            executorService.submit(this::saveToFile); // Ghi dữ liệu đã sửa trong đa luồng
+            System.out.println("Thông tin khách hàng đã được cập nhật thành công.");
+        });
+    }
+
+    // Lưu thông tin khách hàng mới vào file
+    private void saveToFilePartially(Customer customer) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) { // Bật chế độ ghi nối (append mode)
+            writer.write(customer.getName() + "," + customer.getEmail() + "," + customer.getPhoneNumber());
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Lỗi khi lưu dữ liệu vào file: " + e.getMessage());
         }
     }
 
-    // Luu danh sach khach hang vao file
-    private void saveCustomersToFile() {
-        // luu file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Customer customer : customers) {
-                writer.write(customer.getName() + "," + customer.getEmail() + "," + customer.getPhoneNumber() + "," + customer.getAddress());
+    // Lưu toàn bộ thông tin khách hàng vào file
+    private void saveToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) { // Ghi đè lên file
+            for (Customer customer : customerMap.values()) {
+                writer.write(customer.getName() + "," + customer.getEmail() + "," + customer.getPhoneNumber());
                 writer.newLine();
             }
-            System.out.println("Du lieu da duoc luu vao file thanh cong!");
-        }            catch (IOException e) {
-            System.out.println("Da xay ra loi khi luu du lieu: " + e.getMessage());
+            System.out.println("Tất cả dữ liệu đã được lưu vào file thành công.");
+        } catch (IOException e) {
+            System.out.println("Lỗi khi lưu dữ liệu vào file: " + e.getMessage());
         }
     }
 
-    // Tai danh sach khach hang tu file
-    private void loadCustomersFromFile() {
-        // doc file
+    // Tải dữ liệu khách hàng từ file
+    private void loadFromFile() {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            try {
+                file.createNewFile(); // Tạo tệp nếu nó không tồn tại
+                System.out.println("Tệp không tồn tại. Tệp mới đã được tạo.");
+            } catch (IOException e) {
+                System.out.println("Lỗi khi tạo tệp: " + e.getMessage());
+            }
+            return;
+        }
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                       String[] data = line.split(",");
-                if (data.length == 4) {
-                          customers.add(new Customer(data[0], data[1], data[2], data[3]));
+                String[] data = line.split(",");
+                if (data.length == 3) {
+                    Customer customer = new Customer(data[0], data[1], data[2]);
+                    customerMap.put(customer.getPhoneNumber(), customer);
                 }
             }
-            System.out.println("Du lieu da duoc tai tu file thanh cong!");
-        }          catch (IOException e) {
-            System.out.println("Da xay ra loi khi tai du lieu: " + e.getMessage());
+            System.out.println("Dữ liệu đã được tải từ file thành công.");
+        } catch (IOException e) {
+            System.out.println("Không thể tải dữ liệu từ file: " + e.getMessage());
         }
     }
 
-    // Kiem tra so dien thoai da ton tai chua
-    private boolean isPhoneNumberExists(String phoneNumber) {
-        for (Customer customer : customers) {
-            if (customer.getPhoneNumber().equals(phoneNumber)) {
-                return true;
+    // Xóa khách hàng
+    public void deleteCustomer() {
+        System.out.print("Nhập số điện thoại khách hàng cần xóa: ");
+        String phoneNumber = scanner.nextLine();
+
+        if (!customerMap.containsKey(phoneNumber)) {
+            System.out.println("Khách hàng không tồn tại.");
+            return;
+        }
+
+        customerMap.remove(phoneNumber);
+        executorService.submit(this::saveToFile); // Ghi dữ liệu đã xóa trong đa luồng
+        System.out.println("Khách hàng đã được xóa thành công.");
+    }
+
+    // Tìm kiếm khách hàng theo số điện thoại
+    public void searchCustomerByPhone() {
+        while (true) {
+            System.out.print("Nhập số điện thoại khách hàng cần tìm (hoặc 'e' để thoát): ");
+            String phoneNumber = scanner.nextLine();
+
+            if (phoneNumber.equalsIgnoreCase("e")) {
+                System.out.println("Đã thoát tìm kiếm khách hàng.");
+                break;
+            }
+
+            Customer customer = customerMap.get(phoneNumber);
+
+            if (customer != null) {
+                System.out.printf("Khách hàng tìm thấy:%nTên: %s, Email: %s, Số điện thoại: %s%n",
+                        customer.getName(), customer.getEmail(), customer.getPhoneNumber());
+                break; // Thoát khỏi vòng lặp khi tìm thấy khách hàng
+            } else {
+                System.out.println("Không tìm thấy khách hàng với số điện thoại đã nhập. Vui lòng thử lại.");
             }
         }
-        return false;
     }
 
-    // Kiem tra email hop le
-    private boolean isValidEmail(String email) {
-             return email.contains("@") && email.contains(".");
+    public static boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
     }
 
+    public static boolean isValidPhoneNumber(String phoneNumber) {
+        return phoneNumber.matches("^\\d{10}$");
+    }
 
-    private boolean isValidPhoneNumber(String phoneNumber) {
-        return phoneNumber.length() == 10 && phoneNumber.matches("\\d{10}");
+    public void generateCustomerData(int numberOfCustomers) {
+        Random random = new Random();
+        String[] names = {"Nguyen", "Tran", "Le", "Pham", "Hoang", "Ngoc", "Bui", "Vu", "Dang", "Ngo"};
+        String[] domains = {"gmail.com", "yahoo.com", "hotmail.com", "fpt.edu.vn"};
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (int i = 0; i < numberOfCustomers; i++) {
+                String name = names[random.nextInt(names.length)] + " " + (random.nextInt(100) + 1);
+                String email = name.toLowerCase().replace(" ", "") + "@" + domains[random.nextInt(domains.length)];
+                String phoneNumber = String.valueOf(1000000000 + random.nextInt(900000000)); // 10 chữ số
+
+                Customer customer = new Customer(name, email, phoneNumber);
+                customerMap.put(phoneNumber, customer);
+                writer.write(customer.getName() + "," + customer.getEmail() + "," + customer.getPhoneNumber());
+                writer.newLine();
+            }
+            System.out.println("Dữ liệu khách hàng đã được tạo thành công với " + numberOfCustomers + " khách hàng.");
+        } catch (IOException e) {
+            System.out.println("Lỗi khi tạo dữ liệu khách hàng: " + e.getMessage());
+        }
+    }
+
+    // Đo thời gian thực hiện và ghi log
+    private void logExecutionTime(String actionName, Runnable action) {
+        long startTime = System.currentTimeMillis();
+        action.run();
+        long endTime = System.currentTimeMillis();
+        System.out.printf("Thời gian thực hiện '%s': %d ms%n", actionName, endTime - startTime);
+    }
+
+    public void shutdown() {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
     }
 }
-
-
-
-
-
